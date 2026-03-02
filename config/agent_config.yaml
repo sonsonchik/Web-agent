@@ -1,0 +1,8 @@
+uid: AGENT_001
+server: https://localhost/api
+interval: 10
+max_interval: 120
+backoff_multiplier: 2
+tasks_dir: tasks
+results_dir: results
+log_file: logs/agent.log
