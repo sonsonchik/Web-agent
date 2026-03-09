@@ -1,0 +1,27 @@
+# Build artifacts
+build/
+cmake-build-*/
+*.o
+*.exe
+*.out
+web_agent
+test_*
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs and results
+logs/
+results/
+tasks/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Config with secrets (optional)
+config/agent_config.local.yaml

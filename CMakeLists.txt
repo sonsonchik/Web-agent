@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 project(web_agent VERSION 0.1.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -26,7 +27,6 @@ add_library(web_agent_lib
 
 target_include_directories(web_agent_lib
   PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
@@ -42,14 +42,17 @@ if(WEB_AGENT_BUILD_TESTS)
   enable_testing()
 
   add_executable(test_config tests/test_config.cpp)
+  target_include_directories(test_config PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
   target_link_libraries(test_config PRIVATE web_agent_lib)
   add_test(NAME test_config COMMAND test_config)
 
   add_executable(test_network tests/test_network.cpp)
+  target_include_directories(test_network PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
   target_link_libraries(test_network PRIVATE web_agent_lib)
   add_test(NAME test_network COMMAND test_network)
 
   add_executable(test_executor tests/test_executor.cpp)
+  target_include_directories(test_executor PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
   target_link_libraries(test_executor PRIVATE web_agent_lib)
   add_test(NAME test_executor COMMAND test_executor)
 endif()
