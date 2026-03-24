@@ -5,5 +5,11 @@
 
 namespace webagent {
 
+class FileManager {
+public:
+  bool ensureDirectory(const std::string& directory) const;
+  bool moveToResults(const std::string& source, const std::string& destination) const;
+  std::vector<unsigned char> readBinary(const std::string& path) const;
+};
 
-}
+}  // namespace webagent
