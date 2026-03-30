@@ -1,0 +1,2 @@
+/usr/bin/ar qc libweb_agent_lib.a CMakeFiles/web_agent_lib.dir/src/core/Agent.cpp.o CMakeFiles/web_agent_lib.dir/src/config/ConfigManager.cpp.o CMakeFiles/web_agent_lib.dir/src/network/NetworkClient.cpp.o CMakeFiles/web_agent_lib.dir/src/task/TaskManager.cpp.o CMakeFiles/web_agent_lib.dir/src/executor/Executor.cpp.o CMakeFiles/web_agent_lib.dir/src/file/FileManager.cpp.o CMakeFiles/web_agent_lib.dir/src/logger/Logger.cpp.o
+/usr/bin/ranlib libweb_agent_lib.a

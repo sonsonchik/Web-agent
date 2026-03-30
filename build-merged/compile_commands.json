@@ -1,0 +1,68 @@
+[
+{
+  "directory": "/Users/daniil/VS progects/Web-agent/build-merged",
+  "command": "/usr/bin/c++ -DWEB_AGENT_HAS_CURL=1 -I\"/Users/daniil/VS progects/Web-agent/include\" -I\"/Users/daniil/VS progects/Web-agent/build-merged/_deps/nlohmann_json-src/include\" -std=c++17 -o CMakeFiles/web_agent_lib.dir/src/core/Agent.cpp.o -c \"/Users/daniil/VS progects/Web-agent/src/core/Agent.cpp\"",
+  "file": "/Users/daniil/VS progects/Web-agent/src/core/Agent.cpp",
+  "output": "CMakeFiles/web_agent_lib.dir/src/core/Agent.cpp.o"
+},
+{
+  "directory": "/Users/daniil/VS progects/Web-agent/build-merged",
+  "command": "/usr/bin/c++ -DWEB_AGENT_HAS_CURL=1 -I\"/Users/daniil/VS progects/Web-agent/include\" -I\"/Users/daniil/VS progects/Web-agent/build-merged/_deps/nlohmann_json-src/include\" -std=c++17 -o CMakeFiles/web_agent_lib.dir/src/config/ConfigManager.cpp.o -c \"/Users/daniil/VS progects/Web-agent/src/config/ConfigManager.cpp\"",
+  "file": "/Users/daniil/VS progects/Web-agent/src/config/ConfigManager.cpp",
+  "output": "CMakeFiles/web_agent_lib.dir/src/config/ConfigManager.cpp.o"
+},
+{
+  "directory": "/Users/daniil/VS progects/Web-agent/build-merged",
+  "command": "/usr/bin/c++ -DWEB_AGENT_HAS_CURL=1 -I\"/Users/daniil/VS progects/Web-agent/include\" -I\"/Users/daniil/VS progects/Web-agent/build-merged/_deps/nlohmann_json-src/include\" -std=c++17 -o CMakeFiles/web_agent_lib.dir/src/network/NetworkClient.cpp.o -c \"/Users/daniil/VS progects/Web-agent/src/network/NetworkClient.cpp\"",
+  "file": "/Users/daniil/VS progects/Web-agent/src/network/NetworkClient.cpp",
+  "output": "CMakeFiles/web_agent_lib.dir/src/network/NetworkClient.cpp.o"
+},
+{
+  "directory": "/Users/daniil/VS progects/Web-agent/build-merged",
+  "command": "/usr/bin/c++ -DWEB_AGENT_HAS_CURL=1 -I\"/Users/daniil/VS progects/Web-agent/include\" -I\"/Users/daniil/VS progects/Web-agent/build-merged/_deps/nlohmann_json-src/include\" -std=c++17 -o CMakeFiles/web_agent_lib.dir/src/task/TaskManager.cpp.o -c \"/Users/daniil/VS progects/Web-agent/src/task/TaskManager.cpp\"",
+  "file": "/Users/daniil/VS progects/Web-agent/src/task/TaskManager.cpp",
+  "output": "CMakeFiles/web_agent_lib.dir/src/task/TaskManager.cpp.o"
+},
+{
+  "directory": "/Users/daniil/VS progects/Web-agent/build-merged",
+  "command": "/usr/bin/c++ -DWEB_AGENT_HAS_CURL=1 -I\"/Users/daniil/VS progects/Web-agent/include\" -I\"/Users/daniil/VS progects/Web-agent/build-merged/_deps/nlohmann_json-src/include\" -std=c++17 -o CMakeFiles/web_agent_lib.dir/src/executor/Executor.cpp.o -c \"/Users/daniil/VS progects/Web-agent/src/executor/Executor.cpp\"",
+  "file": "/Users/daniil/VS progects/Web-agent/src/executor/Executor.cpp",
+  "output": "CMakeFiles/web_agent_lib.dir/src/executor/Executor.cpp.o"
+},
+{
+  "directory": "/Users/daniil/VS progects/Web-agent/build-merged",
+  "command": "/usr/bin/c++ -DWEB_AGENT_HAS_CURL=1 -I\"/Users/daniil/VS progects/Web-agent/include\" -I\"/Users/daniil/VS progects/Web-agent/build-merged/_deps/nlohmann_json-src/include\" -std=c++17 -o CMakeFiles/web_agent_lib.dir/src/file/FileManager.cpp.o -c \"/Users/daniil/VS progects/Web-agent/src/file/FileManager.cpp\"",
+  "file": "/Users/daniil/VS progects/Web-agent/src/file/FileManager.cpp",
+  "output": "CMakeFiles/web_agent_lib.dir/src/file/FileManager.cpp.o"
+},
+{
+  "directory": "/Users/daniil/VS progects/Web-agent/build-merged",
+  "command": "/usr/bin/c++ -DWEB_AGENT_HAS_CURL=1 -I\"/Users/daniil/VS progects/Web-agent/include\" -I\"/Users/daniil/VS progects/Web-agent/build-merged/_deps/nlohmann_json-src/include\" -std=c++17 -o CMakeFiles/web_agent_lib.dir/src/logger/Logger.cpp.o -c \"/Users/daniil/VS progects/Web-agent/src/logger/Logger.cpp\"",
+  "file": "/Users/daniil/VS progects/Web-agent/src/logger/Logger.cpp",
+  "output": "CMakeFiles/web_agent_lib.dir/src/logger/Logger.cpp.o"
+},
+{
+  "directory": "/Users/daniil/VS progects/Web-agent/build-merged",
+  "command": "/usr/bin/c++ -DWEB_AGENT_HAS_CURL=1 -I\"/Users/daniil/VS progects/Web-agent/include\" -I\"/Users/daniil/VS progects/Web-agent/build-merged/_deps/nlohmann_json-src/include\" -std=c++17 -o CMakeFiles/web_agent.dir/src/main.cpp.o -c \"/Users/daniil/VS progects/Web-agent/src/main.cpp\"",
+  "file": "/Users/daniil/VS progects/Web-agent/src/main.cpp",
+  "output": "CMakeFiles/web_agent.dir/src/main.cpp.o"
+},
+{
+  "directory": "/Users/daniil/VS progects/Web-agent/build-merged",
+  "command": "/usr/bin/c++ -DWEB_AGENT_HAS_CURL=1 -I\"/Users/daniil/VS progects/Web-agent/include\" -I\"/Users/daniil/VS progects/Web-agent/build-merged/_deps/nlohmann_json-src/include\" -std=c++17 -o CMakeFiles/test_config.dir/tests/test_config.cpp.o -c \"/Users/daniil/VS progects/Web-agent/tests/test_config.cpp\"",
+  "file": "/Users/daniil/VS progects/Web-agent/tests/test_config.cpp",
+  "output": "CMakeFiles/test_config.dir/tests/test_config.cpp.o"
+},
+{
+  "directory": "/Users/daniil/VS progects/Web-agent/build-merged",
+  "command": "/usr/bin/c++ -DWEB_AGENT_HAS_CURL=1 -I\"/Users/daniil/VS progects/Web-agent/include\" -I\"/Users/daniil/VS progects/Web-agent/build-merged/_deps/nlohmann_json-src/include\" -std=c++17 -o CMakeFiles/test_network.dir/tests/test_network.cpp.o -c \"/Users/daniil/VS progects/Web-agent/tests/test_network.cpp\"",
+  "file": "/Users/daniil/VS progects/Web-agent/tests/test_network.cpp",
+  "output": "CMakeFiles/test_network.dir/tests/test_network.cpp.o"
+},
+{
+  "directory": "/Users/daniil/VS progects/Web-agent/build-merged",
+  "command": "/usr/bin/c++ -DWEB_AGENT_HAS_CURL=1 -I\"/Users/daniil/VS progects/Web-agent/include\" -I\"/Users/daniil/VS progects/Web-agent/build-merged/_deps/nlohmann_json-src/include\" -std=c++17 -o CMakeFiles/test_executor.dir/tests/test_executor.cpp.o -c \"/Users/daniil/VS progects/Web-agent/tests/test_executor.cpp\"",
+  "file": "/Users/daniil/VS progects/Web-agent/tests/test_executor.cpp",
+  "output": "CMakeFiles/test_executor.dir/tests/test_executor.cpp.o"
+}
+]

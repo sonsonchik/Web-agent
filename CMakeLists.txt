@@ -8,6 +8,17 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 option(WEB_AGENT_BUILD_TESTS "Build unit tests" ON)
 
+find_package(nlohmann_json QUIET)
+if(NOT nlohmann_json_FOUND)
+  include(FetchContent)
+  FetchContent_Declare(
+    nlohmann_json
+    URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz
+    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+  )
+  FetchContent_MakeAvailable(nlohmann_json)
+endif()
+
 find_package(CURL QUIET)
 if(CURL_FOUND)
   message(STATUS "libcurl found: HTTPS client enabled")
@@ -29,6 +40,8 @@ target_include_directories(web_agent_lib
   PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
+
+target_link_libraries(web_agent_lib PUBLIC nlohmann_json::nlohmann_json)
 
 if(CURL_FOUND)
   target_compile_definitions(web_agent_lib PUBLIC WEB_AGENT_HAS_CURL=1)

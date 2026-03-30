@@ -41,3 +41,29 @@
 5. Или просто пересобери проект:
    ```bash
    cd build && cmake .. && make
+
+## Кроссплатформенная сборка и запуск
+
+Проект собирается через CMake и использует C++17.
+
+### macOS / Linux
+
+```bash
+cmake -S . -B build
+cmake --build build -j
+./build/web_agent
+ctest --test-dir build --output-on-failure
+```
+
+### Windows (PowerShell)
+
+```powershell
+cmake -S . -B build
+cmake --build build --config Release
+.\build\Release\web_agent.exe
+ctest --test-dir build -C Release --output-on-failure
+```
+
+Зависимости:
+- `libcurl`
+- `nlohmann/json` (если не установлена в системе, подтягивается автоматически через CMake `FetchContent`)
