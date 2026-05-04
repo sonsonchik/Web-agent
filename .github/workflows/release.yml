@@ -5,6 +5,9 @@ on:
     tags:
       - "v*"
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 permissions:
   contents: write
 
@@ -32,7 +35,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install dependencies (Linux)
         if: runner.os == 'Linux'
@@ -90,7 +93,7 @@ jobs:
           Compress-Archive -Path dist/${{ matrix.artifact_name }} -DestinationPath ${{ matrix.artifact_name }}-${{ github.ref_name }}.zip -Force
 
       - name: Upload asset
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.artifact_name }}
           path: |
@@ -105,12 +108,17 @@ jobs:
 
     steps:
       - name: Download assets
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           path: release-assets
 
+      - name: Show downloaded assets
+        run: |
+          echo "Downloaded files:"
+          find release-assets -type f | sort
+
       - name: Create release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: release-assets/**/*
           generate_release_notes: true
