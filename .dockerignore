@@ -1,0 +1,11 @@
+.git
+.github
+build
+build-*
+cmake-build-*
+logs
+results
+tasks
+.vscode
+.idea
+.DS_Store

@@ -1,53 +1,28 @@
-## Project Structure
+## Web Agent
+
+C++17-агент, который регистрируется на сервере, получает задания и отправляет результаты выполнения.
+
+## Документация
+- Пользовательская документация: [docs/user-guide.md](docs/user-guide.md)
+- Описание опций заданий: [docs/task-options.md](docs/task-options.md)
+- Релизы для платформ: [docs/releases.md](docs/releases.md)
+
+## Структура проекта
+```text
 .
-├── include/ # Public headers
+├── include/               # Публичные заголовки
+├── src/                   # Исходники
+├── tests/                 # Тесты
+├── config/                # Конфигурация
+├── docs/                  # Документация пользователя и заданий
+├── logs/                  # Логи (gitignored)
+├── tasks/                 # Временные данные задач (gitignored)
+└── results/               # Результаты (gitignored)
+```
 
-│ ├── core/ # Core agent classes
-
-│ ├── config/ # Configuration management
-
-│ ├── network/ # HTTP/HTTPS client
-
-│ └── ...
-
-├── src/ # Implementation files
-
-│ ├── core/
-
-│ ├── config/
-
-│ └── ...
-
-├── tests/ # Unit tests
-
-├── config/ # Configuration files
-
-├── logs/ # Log files (gitignored)
-
-├── tasks/ # Task storage (gitignored)
-
-└── results/ # Results storage (gitignored)
-
-## Настройка VS Code (для разработчиков)
-
-Чтобы убрать красные волнистые линии в VS Code:
-
-1. Установи расширение "C/C++" (ms-vscode.cpptools)
-2. Открой проект и нажми `Ctrl+Shift+P`
-3. Выбери "C/C++: Edit Configurations (UI)"
-4. В поле "Include path" добавь:
-   - `${workspaceFolder}/include`
-   - `${workspaceFolder}/src`
-5. Или просто пересобери проект:
-   ```bash
-   cd build && cmake .. && make
-
-## Кроссплатформенная сборка и запуск
-
-Проект собирается через CMake и использует C++17.
+## Сборка и запуск
 
 ### macOS / Linux
-
 ```bash
 cmake -S . -B build
 cmake --build build -j
@@ -56,7 +31,6 @@ ctest --test-dir build --output-on-failure
 ```
 
 ### Windows (PowerShell)
-
 ```powershell
 cmake -S . -B build
 cmake --build build --config Release
@@ -66,4 +40,30 @@ ctest --test-dir build -C Release --output-on-failure
 
 Зависимости:
 - `libcurl`
-- `nlohmann/json` (если не установлена в системе, подтягивается автоматически через CMake `FetchContent`)
+- `nlohmann/json` (подтягивается через CMake `FetchContent`, если не установлена в системе)
+
+## Релизы для платформ
+Релизы публикуются в GitHub Releases автоматически по тегу `v*`.
+
+Что публикуется:
+- Linux-архив с бинарником
+- macOS-архив с бинарником
+- Windows-архив с бинарником `.exe`
+
+Как выпустить релиз:
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+Workflow-файлы:
+- `.github/workflows/ci.yml` — сборка и тесты на Linux/macOS/Windows
+- `.github/workflows/release.yml` — публикация релизных артефактов в GitHub
+
+## Docker (опционально)
+Для воспроизводимой Linux-сборки добавлен `Dockerfile`.
+
+```bash
+docker build -t web-agent:local .
+docker run --rm web-agent:local
+```

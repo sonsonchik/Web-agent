@@ -1,0 +1,105 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-release-assets:
+    name: Build release asset (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact_name: web-agent-linux
+            bin_path: build/web_agent
+            archive_ext: tar.gz
+          - os: macos-latest
+            artifact_name: web-agent-macos
+            bin_path: build/web_agent
+            archive_ext: tar.gz
+          - os: windows-latest
+            artifact_name: web-agent-windows
+            bin_path: build/Release/web_agent.exe
+            archive_ext: zip
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure (Linux/macOS)
+        if: runner.os != 'Windows'
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build (Linux/macOS)
+        if: runner.os != 'Windows'
+        run: cmake --build build -j
+
+      - name: Configure (Windows)
+        if: runner.os == 'Windows'
+        run: cmake -S . -B build
+
+      - name: Build (Windows)
+        if: runner.os == 'Windows'
+        run: cmake --build build --config Release
+
+      - name: Prepare artifact directory (Linux/macOS)
+        if: runner.os != 'Windows'
+        run: |
+          mkdir -p dist/${{ matrix.artifact_name }}
+          cp ${{ matrix.bin_path }} dist/${{ matrix.artifact_name }}/
+          cp README.md dist/${{ matrix.artifact_name }}/
+          cp -r docs dist/${{ matrix.artifact_name }}/docs
+
+      - name: Pack artifact (Linux/macOS)
+        if: runner.os != 'Windows'
+        run: |
+          tar -czf ${{ matrix.artifact_name }}-${{ github.ref_name }}.tar.gz -C dist ${{ matrix.artifact_name }}
+
+      - name: Prepare artifact directory (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path dist/${{ matrix.artifact_name }} -Force | Out-Null
+          Copy-Item ${{ matrix.bin_path }} dist/${{ matrix.artifact_name }}/web_agent.exe
+          Copy-Item README.md dist/${{ matrix.artifact_name }}/
+          Copy-Item docs -Destination dist/${{ matrix.artifact_name }}/docs -Recurse
+
+      - name: Pack artifact (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Compress-Archive -Path dist/${{ matrix.artifact_name }} -DestinationPath ${{ matrix.artifact_name }}-${{ github.ref_name }}.zip -Force
+
+      - name: Upload asset
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: |
+            ${{ matrix.artifact_name }}-${{ github.ref_name }}.tar.gz
+            ${{ matrix.artifact_name }}-${{ github.ref_name }}.zip
+          if-no-files-found: ignore
+
+  publish-release:
+    name: Publish GitHub Release
+    runs-on: ubuntu-latest
+    needs: build-release-assets
+
+    steps:
+      - name: Download assets
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release-assets/**/*
+          generate_release_notes: true
