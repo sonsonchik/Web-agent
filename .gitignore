@@ -6,6 +6,7 @@ cmake-build-*/
 *.out
 web_agent
 test_*
+!tests/test_*.cpp
 
 # IDE files
 .vscode/
