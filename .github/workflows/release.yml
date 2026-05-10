@@ -6,6 +6,9 @@ on:
 permissions:
   contents: write
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
 concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: false
@@ -29,44 +32,53 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Configure
-        run: cmake -S . -B build -DWEB_AGENT_BUILD_TESTS=ON
+        run: cmake -S . -B build -DWEB_AGENT_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release
 
       - name: Build
-        run: cmake --build build --config Release
+        run: cmake --build build --config Release --parallel
 
       - name: Test
-        run: ctest --test-dir build -C Release --output-on-failure
+        run: ctest --test-dir build --build-config Release --output-on-failure
 
       - name: Package (Linux)
         if: runner.os == 'Linux'
         shell: bash
         run: |
-          cmake --install build --prefix build/install
+          set -euo pipefail
+          cmake --install build --prefix build/install --config Release
           cpack --config build/CPackConfig.cmake -G TGZ -B build/package
           mkdir -p dist
-          cp build/package/*.tar.gz dist/web-agent-linux-x86_64.tar.gz
+          ls -la build/package
+          cp -v build/package/*.tar.gz dist/web-agent-linux-x86_64.tar.gz
 
       - name: Package (macOS)
         if: runner.os == 'macOS'
         shell: bash
         run: |
-          cmake --install build --prefix build/install
+          set -euo pipefail
+          cmake --install build --prefix build/install --config Release
           cpack --config build/CPackConfig.cmake -G ZIP -B build/package
           mkdir -p dist
-          cp build/package/*.zip dist/web-agent-macos-universal.zip
+          ls -la build/package
+          cp -v build/package/*.zip dist/web-agent-macos-universal.zip
           APP_BUNDLE="build/web-agent.app"
           if [ ! -d "$APP_BUNDLE" ]; then
             APP_BUNDLE="build/Release/web-agent.app"
           fi
+          if [ ! -d "$APP_BUNDLE" ]; then
+            APP_BUNDLE="build/Debug/web-agent.app"
+          fi
+          test -d "$APP_BUNDLE"
           ditto -c -k --sequesterRsrc --keepParent "$APP_BUNDLE" dist/web-agent-macos.app.zip
 
       - name: Package (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          cmake --install build --prefix build/install
+          cmake --install build --prefix build/install --config Release
           cpack --config build/CPackConfig.cmake -G ZIP -B build/package
           New-Item -ItemType Directory -Path dist -Force | Out-Null
+          Get-ChildItem build/package
           Copy-Item build/package/*.zip dist/web-agent-windows-x86_64.zip
           if (Test-Path build/Release/web-agent.exe) {
             Copy-Item build/Release/web-agent.exe dist/web-agent-windows.exe
