@@ -1,0 +1,15 @@
+[2026-05-11 02:36:31] [INFO] Agent started. UID=77777aaaaaa server=https://xdev.arkcom.ru:9999/app/webagent1/api
+[2026-05-11 02:36:32] [INFO] No executable task in server payload: {"code_responce":"0","status":"WAIT"}
+[2026-05-11 02:36:43] [INFO] Task received: id=aiGrbrfL-mYKj-yYiZ-afqe-DWv1Czmwewew type=send_file
+[2026-05-11 02:36:43] [INFO] wa_result response: status=200 body={"code_responce":"0","msg":"ok"}
+[2026-05-11 02:36:43] [INFO] Task completed: id=aiGrbrfL-mYKj-yYiZ-afqe-DWv1Czmwewew exit_code=0
+[2026-05-11 02:36:54] [INFO] No executable task in server payload: {"code_responce":"0","status":"WAIT"}
+[2026-05-11 02:37:05] [INFO] No executable task in server payload: {"code_responce":"0","status":"WAIT"}
+[2026-05-11 02:37:16] [INFO] No executable task in server payload: {"code_responce":"0","status":"WAIT"}
+[2026-05-11 02:37:27] [INFO] No executable task in server payload: {"code_responce":"0","status":"WAIT"}
+[2026-05-11 02:37:38] [INFO] No executable task in server payload: {"code_responce":"0","status":"WAIT"}
+[2026-05-11 02:37:49] [INFO] Task received: id=zujGKMmf-svgi-AhqH-mjqY-GGeLobuKezeY type=run_program
+[2026-05-11 02:37:49] [INFO] wa_result response: status=200 body={"code_responce":"0","msg":"ok"}
+[2026-05-11 02:37:49] [INFO] Task completed: id=zujGKMmf-svgi-AhqH-mjqY-GGeLobuKezeY exit_code=0
+[2026-05-11 02:38:00] [INFO] No executable task in server payload: {"code_responce":"0","status":"WAIT"}
+[2026-05-11 02:38:11] [INFO] No executable task in server payload: {"code_responce":"0","status":"WAIT"}

@@ -35,8 +35,27 @@ if(CURL_FOUND)
   target_link_libraries(web_agent_lib PUBLIC CURL::libcurl)
 endif()
 
-add_executable(web_agent src/main.cpp)
+if(APPLE)
+  add_executable(web_agent MACOSX_BUNDLE src/main.cpp)
+  set_target_properties(web_agent PROPERTIES
+    MACOSX_BUNDLE_BUNDLE_NAME "Web Agent"
+    MACOSX_BUNDLE_GUI_IDENTIFIER "com.webagent.app"
+    MACOSX_BUNDLE_BUNDLE_VERSION "${PROJECT_VERSION}"
+    MACOSX_BUNDLE_SHORT_VERSION_STRING "${PROJECT_VERSION}"
+  )
+else()
+  add_executable(web_agent src/main.cpp)
+endif()
+
+set_target_properties(web_agent PROPERTIES OUTPUT_NAME "web-agent")
 target_link_libraries(web_agent PRIVATE web_agent_lib)
+
+install(TARGETS web_agent
+  RUNTIME DESTINATION bin
+  BUNDLE DESTINATION .
+)
+install(DIRECTORY config DESTINATION .)
+install(FILES README.md DESTINATION .)
 
 if(WEB_AGENT_BUILD_TESTS)
   enable_testing()
@@ -55,4 +74,25 @@ if(WEB_AGENT_BUILD_TESTS)
   target_include_directories(test_executor PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
   target_link_libraries(test_executor PRIVATE web_agent_lib)
   add_test(NAME test_executor COMMAND test_executor)
+
+  add_executable(test_task tests/test_task.cpp)
+  target_include_directories(test_task PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+  target_link_libraries(test_task PRIVATE web_agent_lib)
+  add_test(NAME test_task COMMAND test_task)
 endif()
+
+include(InstallRequiredSystemLibraries)
+set(CPACK_PACKAGE_NAME "web-agent")
+set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
+set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${PROJECT_VERSION}-${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
+
+if(WIN32)
+  set(CPACK_GENERATOR "ZIP")
+elseif(APPLE)
+  set(CPACK_GENERATOR "ZIP")
+else()
+  set(CPACK_GENERATOR "TGZ")
+endif()
+
+include(CPack)

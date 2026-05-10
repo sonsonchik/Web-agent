@@ -45,6 +45,12 @@ AgentConfig ConfigManager::load(const std::string& file_path) const {
 
     if (key == "uid") config.uid = value;
     else if (key == "server") config.server_uri = value;
+    else if (key == "register_path") config.register_path = value;
+    else if (key == "task_path") config.task_path = value;
+    else if (key == "result_path") config.result_path = value;
+    else if (key == "ping_path") config.ping_path = value;
+    else if (key == "access_code") config.access_code = value;
+    else if (key == "description") config.description = value;
     else if (key == "interval") config.poll_interval_sec = std::stoi(value);
     else if (key == "max_interval") config.max_poll_interval_sec = std::stoi(value);
     else if (key == "backoff_multiplier") config.backoff_multiplier = std::stoi(value);

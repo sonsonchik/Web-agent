@@ -1,5 +1,11 @@
-uid: AGENT_001
-server: https://localhost/api
+uid: 77777aaaaaa
+server: https://xdev.arkcom.ru:9999/app/webagent1/api
+register_path: /wa_reg/
+task_path: /wa_task/
+result_path: /wa_result/
+ping_path: /wa_reg/
+access_code: efcaf0-33e9-0fff-3ff2-ceaa255f
+description: web-agent-macos
 interval: 10
 max_interval: 120
 backoff_multiplier: 2

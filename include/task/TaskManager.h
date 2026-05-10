@@ -10,6 +10,7 @@ struct TaskInstruction {
   std::string type;
   std::string command;
   std::string args;
+  std::string options;
   std::string output_file;
   bool is_empty = true;
 };
