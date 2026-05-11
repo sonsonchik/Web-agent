@@ -2,6 +2,8 @@ name: Build and Release
 
 on:
   push:
+    branches:
+      - main
 
 permissions:
   contents: write
@@ -20,121 +22,226 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            artifact_suffix: linux
+            artifact_name: web-agent-linux
+            archive_name: web-agent-linux-x86_64.tar.gz
+
           - os: macos-latest
-            artifact_suffix: macos
+            artifact_name: web-agent-macos
+            archive_name: web-agent-macos.zip
+
           - os: windows-latest
-            artifact_suffix: windows
+            artifact_name: web-agent-windows
+            archive_name: web-agent-windows-x86_64.zip
+
     runs-on: ${{ matrix.os }}
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v5
 
-      - name: Configure
-        run: cmake -S . -B build -DWEB_AGENT_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release
+      - name: Configure CMake
+        shell: bash
+        run: |
+          cmake -S . -B build \
+            -DWEB_AGENT_BUILD_TESTS=ON \
+            -DCMAKE_BUILD_TYPE=Release
 
       - name: Build
-        run: cmake --build build --config Release --parallel
+        shell: bash
+        run: |
+          cmake --build build --config Release --parallel
 
-      - name: Test
-        run: ctest --test-dir build --build-config Release --output-on-failure
+      - name: Run tests
+        shell: bash
+        run: |
+          ctest --test-dir build \
+            --build-config Release \
+            --output-on-failure
+
+      ####################################################################
+      # Linux
+      ####################################################################
 
       - name: Package Linux
         if: runner.os == 'Linux'
         shell: bash
         run: |
           set -euo pipefail
+
           mkdir -p dist/web-agent-linux/config
+
           cp build/web-agent dist/web-agent-linux/
           cp config/agent_config.yaml dist/web-agent-linux/config/
           cp README.md dist/web-agent-linux/
+
           tar -C dist -czf dist/web-agent-linux-x86_64.tar.gz web-agent-linux
+
+      ####################################################################
+      # macOS
+      ####################################################################
 
       - name: Package macOS
         if: runner.os == 'macOS'
         shell: bash
         run: |
           set -euo pipefail
+
           mkdir -p dist/web-agent-macos/config
+
           cp build/web-agent dist/web-agent-macos/
           cp config/agent_config.yaml dist/web-agent-macos/config/
           cp README.md dist/web-agent-macos/
+
           cat > dist/web-agent-macos/run-web-agent.command <<'SH'
           #!/bin/bash
+
           SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
           cd "$SCRIPT_DIR"
+
           chmod +x ./web-agent
           ./web-agent
+
           echo
           echo "Press Enter to close..."
           read -r _
           SH
+
           chmod +x dist/web-agent-macos/run-web-agent.command
-          ditto -c -k --keepParent dist/web-agent-macos dist/web-agent-macos.zip
+
+          ditto -c -k --keepParent \
+            dist/web-agent-macos \
+            dist/web-agent-macos.zip
+
+      ####################################################################
+      # Windows
+      ####################################################################
 
       - name: Package Windows
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          New-Item -ItemType Directory -Path dist/web-agent-windows/config -Force | Out-Null
+          New-Item `
+            -ItemType Directory `
+            -Path dist/web-agent-windows/config `
+            -Force | Out-Null
+
           if (Test-Path build/Release/web-agent.exe) {
-            Copy-Item build/Release/web-agent.exe dist/web-agent-windows/web-agent.exe
-          } elseif (Test-Path build/web-agent.exe) {
-            Copy-Item build/web-agent.exe dist/web-agent-windows/web-agent.exe
-          } else {
+            Copy-Item `
+              build/Release/web-agent.exe `
+              dist/web-agent-windows/web-agent.exe
+          }
+          elseif (Test-Path build/web-agent.exe) {
+            Copy-Item `
+              build/web-agent.exe `
+              dist/web-agent-windows/web-agent.exe
+          }
+          else {
             throw "web-agent.exe was not found"
           }
-          Copy-Item config/agent_config.yaml dist/web-agent-windows/config/agent_config.yaml
-          Copy-Item README.md dist/web-agent-windows/README.md
+
+          Copy-Item `
+            config/agent_config.yaml `
+            dist/web-agent-windows/config/agent_config.yaml
+
+          Copy-Item `
+            README.md `
+            dist/web-agent-windows/README.md
+
           @'
           @echo off
           cd /d "%~dp0"
+
           web-agent.exe
+
           echo.
           pause
           '@ | Set-Content dist/web-agent-windows/run-web-agent.bat
-          Compress-Archive -Path dist/web-agent-windows/* -DestinationPath dist/web-agent-windows-x86_64.zip -Force
 
-      - name: Upload artifacts
+          Compress-Archive `
+            -Path dist/web-agent-windows/* `
+            -DestinationPath dist/web-agent-windows-x86_64.zip `
+            -Force
+
+      ####################################################################
+      # Upload artifacts
+      ####################################################################
+
+      - name: Upload artifact
         uses: actions/upload-artifact@v5
         with:
-          name: web-agent-${{ matrix.artifact_suffix }}
-          path: |
-            dist/web-agent-linux-x86_64.tar.gz
-            dist/web-agent-macos.zip
-            dist/web-agent-windows-x86_64.zip
-          if-no-files-found: ignore
+          name: ${{ matrix.artifact_name }}
+          path: dist/${{ matrix.archive_name }}
+          if-no-files-found: error
+
+  ##########################################################################
+  # Publish release
+  ##########################################################################
 
   publish:
     needs: build
     runs-on: ubuntu-latest
 
     steps:
-      - name: Download artifacts
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Download Linux artifact
         uses: actions/download-artifact@v5
         with:
-          path: dist
+          name: web-agent-linux
+          path: release-assets
 
-      - name: Prepare release assets
+      - name: Download macOS artifact
+        uses: actions/download-artifact@v5
+        with:
+          name: web-agent-macos
+          path: release-assets
+
+      - name: Download Windows artifact
+        uses: actions/download-artifact@v5
+        with:
+          name: web-agent-windows
+          path: release-assets
+
+      - name: Show downloaded files
+        shell: bash
         run: |
           set -euo pipefail
-          mkdir -p release-assets
-          cp dist/web-agent-linux/web-agent-linux-x86_64.tar.gz release-assets/
-          cp dist/web-agent-macos/web-agent-macos.zip release-assets/
-          cp dist/web-agent-windows/web-agent-windows-x86_64.zip release-assets/
-          ls -la release-assets
+          find release-assets -type f
 
-      - name: Ensure single rolling release with 3 assets
+      - name: Create or update rolling release
         env:
           GH_TOKEN: ${{ github.token }}
+        shell: bash
         run: |
           set -euo pipefail
-          if gh release view latest >/dev/null 2>&1; then
-            for a in $(gh release view latest --json assets --jq '.assets[].name'); do
-              gh release delete-asset latest "$a" --yes || true
+
+          TAG_NAME="latest"
+
+          if gh release view "$TAG_NAME" >/dev/null 2>&1; then
+            echo "Release exists. Removing old assets..."
+
+            for asset in $(gh release view "$TAG_NAME" \
+              --json assets \
+              --jq '.assets[].name'); do
+
+              gh release delete-asset \
+                "$TAG_NAME" \
+                "$asset" \
+                --yes || true
             done
           else
-            gh release create latest --title "Latest Build" --notes "Rolling latest build"
+            echo "Creating release..."
+
+            gh release create "$TAG_NAME" \
+              --title "Latest Build" \
+              --notes "Automatically generated latest build"
           fi
-          gh release upload latest release-assets/web-agent-linux-x86_64.tar.gz release-assets/web-agent-macos.zip release-assets/web-agent-windows-x86_64.zip --clobber
+
+          echo "Uploading new assets..."
+
+          gh release upload "$TAG_NAME" \
+            release-assets/web-agent-linux-x86_64.tar.gz \
+            release-assets/web-agent-macos.zip \
+            release-assets/web-agent-windows-x86_64.zip \
+            --clobber
