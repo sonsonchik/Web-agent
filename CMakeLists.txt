@@ -35,24 +35,13 @@ if(CURL_FOUND)
   target_link_libraries(web_agent_lib PUBLIC CURL::libcurl)
 endif()
 
-if(APPLE)
-  add_executable(web_agent MACOSX_BUNDLE src/main.cpp)
-  set_target_properties(web_agent PROPERTIES
-    MACOSX_BUNDLE_BUNDLE_NAME "Web Agent"
-    MACOSX_BUNDLE_GUI_IDENTIFIER "com.webagent.app"
-    MACOSX_BUNDLE_BUNDLE_VERSION "${PROJECT_VERSION}"
-    MACOSX_BUNDLE_SHORT_VERSION_STRING "${PROJECT_VERSION}"
-  )
-else()
-  add_executable(web_agent src/main.cpp)
-endif()
+add_executable(web_agent src/main.cpp)
 
 set_target_properties(web_agent PROPERTIES OUTPUT_NAME "web-agent")
 target_link_libraries(web_agent PRIVATE web_agent_lib)
 
 install(TARGETS web_agent
   RUNTIME DESTINATION bin
-  BUNDLE DESTINATION .
 )
 install(DIRECTORY config DESTINATION .)
 install(FILES README.md DESTINATION .)
