@@ -12,7 +12,7 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 concurrency:
-  group: release-latest
+  group: release-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -209,39 +209,19 @@ jobs:
           set -euo pipefail
           find release-assets -type f
 
-      - name: Create or update rolling release
+      - name: Create release with unique tag
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
 
-          TAG_NAME="latest"
+          TAG_NAME="build-${GITHUB_RUN_NUMBER}-${GITHUB_SHA::7}"
+          TITLE="Build ${GITHUB_RUN_NUMBER} (${GITHUB_SHA::7})"
 
-          if gh release view "$TAG_NAME" >/dev/null 2>&1; then
-            echo "Release exists. Removing old assets..."
-
-            for asset in $(gh release view "$TAG_NAME" \
-              --json assets \
-              --jq '.assets[].name'); do
-
-              gh release delete-asset \
-                "$TAG_NAME" \
-                "$asset" \
-                --yes || true
-            done
-          else
-            echo "Creating release..."
-
-            gh release create "$TAG_NAME" \
-              --title "Latest Build" \
-              --notes "Automatically generated latest build"
-          fi
-
-          echo "Uploading new assets..."
-
-          gh release upload "$TAG_NAME" \
+          gh release create "$TAG_NAME" \
+            --title "$TITLE" \
+            --notes "Automatically generated build from commit $GITHUB_SHA" \
             release-assets/web-agent-linux-x86_64.tar.gz \
             release-assets/web-agent-macos.zip \
-            release-assets/web-agent-windows-x86_64.zip \
-            --clobber
+            release-assets/web-agent-windows-x86_64.zip
