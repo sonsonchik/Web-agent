@@ -68,11 +68,11 @@ jobs:
         run: |
           set -euo pipefail
 
-          mkdir -p dist/web-agent-linux/config
+          mkdir -p dist/web-agent-linux
 
           cp build/web-agent dist/web-agent-linux/
-          cp config/agent_config.yaml dist/web-agent-linux/config/
           cp README.md dist/web-agent-linux/
+          cp note.txt dist/web-agent-linux/
 
           tar -C dist -czf dist/web-agent-linux-x86_64.tar.gz web-agent-linux
 
@@ -86,27 +86,11 @@ jobs:
         run: |
           set -euo pipefail
 
-          mkdir -p dist/web-agent-macos/config
+          mkdir -p dist/web-agent-macos
 
           cp build/web-agent dist/web-agent-macos/
-          cp config/agent_config.yaml dist/web-agent-macos/config/
           cp README.md dist/web-agent-macos/
-
-          cat > dist/web-agent-macos/run-web-agent.command <<'SH'
-          #!/bin/bash
-
-          SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-          cd "$SCRIPT_DIR"
-
-          chmod +x ./web-agent
-          ./web-agent
-
-          echo
-          echo "Press Enter to close..."
-          read -r _
-          SH
-
-          chmod +x dist/web-agent-macos/run-web-agent.command
+          cp note.txt dist/web-agent-macos/
 
           ditto -c -k --keepParent \
             dist/web-agent-macos \
@@ -122,7 +106,7 @@ jobs:
         run: |
           New-Item `
             -ItemType Directory `
-            -Path dist/web-agent-windows/config `
+            -Path dist/web-agent-windows `
             -Force | Out-Null
 
           if (Test-Path build/Release/web-agent.exe) {
@@ -140,22 +124,12 @@ jobs:
           }
 
           Copy-Item `
-            config/agent_config.yaml `
-            dist/web-agent-windows/config/agent_config.yaml
-
-          Copy-Item `
             README.md `
             dist/web-agent-windows/README.md
 
-          @'
-          @echo off
-          cd /d "%~dp0"
-
-          web-agent.exe
-
-          echo.
-          pause
-          '@ | Set-Content dist/web-agent-windows/run-web-agent.bat
+          Copy-Item `
+            note.txt `
+            dist/web-agent-windows/note.txt
 
           Compress-Archive `
             -Path dist/web-agent-windows/* `

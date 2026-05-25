@@ -1,0 +1,2 @@
+This file is used by the `send_file` task.
+You can replace its contents with any text you want to upload to the server.
