@@ -29,6 +29,9 @@ std::string normalizeTaskType(const std::string& raw_type) {
   if (type == "FILE" || type == "SEND_FILE") {
     return "send_file";
   }
+  if (type == "GET_FILE" || type == "DOWNLOAD_FILE" || type == "FETCH_FILE") {
+    return "get_file";
+  }
   if (type == "CONF" || type == "CONFIG" || type == "UPDATE_CONFIG") {
     return "update_config";
   }

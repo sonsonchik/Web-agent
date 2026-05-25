@@ -7,6 +7,10 @@
 #include <filesystem>
 #include <thread>
 
+#ifdef WEB_AGENT_HAS_CURL
+#include <curl/curl.h>
+#endif
+
 namespace webagent {
 namespace {
 
@@ -39,6 +43,31 @@ std::string encodeBase64(const std::vector<unsigned char>& data) {
   }
 
   return encoded;
+}
+
+std::string buildTextPreview(const std::vector<unsigned char>& data, std::size_t max_len = 1500) {
+  std::string out;
+  out.reserve(std::min(max_len, data.size()));
+
+  for (std::size_t i = 0; i < data.size() && out.size() < max_len; ++i) {
+    const unsigned char ch = data[i];
+    if (ch == '\n' || ch == '\r' || ch == '\t') {
+      out.push_back(static_cast<char>(ch));
+      continue;
+    }
+    if (ch >= 32 && ch <= 126) {
+      out.push_back(static_cast<char>(ch));
+      continue;
+    }
+    // Keep basic UTF-8 bytes untouched so Cyrillic text remains readable in many cases.
+    if (ch >= 128) {
+      out.push_back(static_cast<char>(ch));
+      continue;
+    }
+    out.push_back(' ');
+  }
+
+  return out;
 }
 
 std::filesystem::path resolveFilePath(const TaskInstruction& task, const AgentConfig& config) {
@@ -154,6 +183,42 @@ bool applyTimeoutUpdate(const TaskInstruction& task, AgentConfig& config, std::s
   }
 }
 
+#ifdef WEB_AGENT_HAS_CURL
+size_t writeDownloadCallback(void* contents, size_t size, size_t nmemb, void* userp) {
+  const size_t total = size * nmemb;
+  auto* buffer = static_cast<std::vector<unsigned char>*>(userp);
+  const auto* ptr = static_cast<unsigned char*>(contents);
+  buffer->insert(buffer->end(), ptr, ptr + total);
+  return total;
+}
+
+bool downloadUrlToMemory(const std::string& url, std::vector<unsigned char>& out, std::string& error) {
+  CURL* curl = curl_easy_init();
+  if (!curl) {
+    error = "curl_easy_init failed";
+    return false;
+  }
+  curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+  curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeDownloadCallback);
+  curl_easy_setopt(curl, CURLOPT_WRITEDATA, &out);
+  curl_easy_setopt(curl, CURLOPT_TIMEOUT, 30L);
+  const CURLcode rc = curl_easy_perform(curl);
+  long status = 0;
+  curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &status);
+  curl_easy_cleanup(curl);
+  if (rc != CURLE_OK) {
+    error = curl_easy_strerror(rc);
+    return false;
+  }
+  if (status < 200 || status >= 300) {
+    error = "HTTP status " + std::to_string(status);
+    return false;
+  }
+  return true;
+}
+#endif
+
 }  // namespace
 
 Agent::Agent(AgentConfig config)
@@ -253,7 +318,46 @@ bool Agent::processSingleCycle() {
         result.file_name = file_path.filename().string();
         result.file_size = bytes.size();
         result.file_content_base64 = encodeBase64(bytes);
-        result.message = "File attached";
+        const std::string preview = buildTextPreview(bytes);
+        if (!preview.empty()) {
+          result.message = "File attached\nPreview:\n" + preview;
+        } else {
+          result.message = "File attached";
+        }
+      }
+    }
+  } else if (task.type == "get_file") {
+    std::filesystem::path output_path = config_.tasks_dir;
+    output_path /= (task.output_file.empty() ? (task.task_id + ".txt") : task.output_file);
+
+    const std::string source = trim(task.options);
+    bool ok = false;
+    if (source.rfind("http://", 0) == 0 || source.rfind("https://", 0) == 0) {
+#ifdef WEB_AGENT_HAS_CURL
+      std::vector<unsigned char> bytes;
+      std::string error;
+      ok = downloadUrlToMemory(source, bytes, error) && file_manager_.writeBinary(output_path.string(), bytes);
+      if (!ok && result.error_text.empty()) {
+        result.error_text = "Failed to download file: " + error;
+      }
+#else
+      result.error_text = "GET_FILE url download requires build with libcurl";
+#endif
+    } else {
+      ok = file_manager_.writeText(output_path.string(), source);
+      if (!ok) {
+        result.error_text = "Failed to write GET_FILE content";
+      }
+    }
+
+    if (ok) {
+      result.exit_code = 0;
+      result.result_path = output_path.string();
+      result.message = "File downloaded to " + result.result_path;
+    } else {
+      result.exit_code = -1;
+      if (result.error_text.empty()) {
+        result.error_text = "GET_FILE failed";
       }
     }
   } else if (task.type == "update_config") {
